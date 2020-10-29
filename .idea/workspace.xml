@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0337796a-3c82-42b1-b522-aebe73750467" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/image-processing-ex1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/image-processing-ex1.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sol1.py" beforeDir="false" afterPath="$PROJECT_DIR$/sol1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

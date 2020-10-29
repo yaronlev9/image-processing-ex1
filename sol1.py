@@ -22,8 +22,3 @@ def read_image(filename, representation):
     else:
         return 'error'
 
-
-
-
-
-print(read_image('astronaut-gray.jpg', 1))
