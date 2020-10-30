@@ -1,15 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 # from scipy import misc
+from numpy.linalg import linalg
 from skimage.color import rgb2gray
 import imageio
+import skimage.color
 
 NUM_OF_PIXELS = 255
+YIQ_MATRIX = np.array([[0.299, 0.587, 0.114], [0.596, -0.275, -0.321], [0.212, -0.523, 0.311]])
 
-# x = np.hstack([np.repeat(np.arange(0,50,2),10)[None,:], np.array([255]*6)[None,:]])
-# grad = np.tile(x,(256,1))
-# print(x)
-# imageio.imwrite("before.jpg", grad)
+x = np.hstack([np.repeat(np.arange(0,50,2),10)[None,:], np.array([255]*6)[None,:]])
+grad = np.tile(x,(256,1))/255
 
 def read_image(filename, representation):
     im = imageio.imread(filename)
@@ -32,5 +33,12 @@ def imdisplay(filename, representation):
     plt.imshow(img, cmap="gray")
     plt.show()
 
-# imdisplay('low_contrast.jpg', 1)
+def rgb2yiq(imRGB):
+    newIm = np.dot(imRGB, YIQ_MATRIX.T)
+    return newIm
+
+def yiq2rgb(imYIQ):
+    newIm = np.dot(imYIQ, linalg.inv(YIQ_MATRIX).T)
+    return newIm
+
 
