@@ -89,13 +89,14 @@ def calc_histogam(im):
     """
     hist, bounds = np.histogram(im, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
     cum_hist = hist.cumsum()
-    normalized = cum_hist / cum_hist[-1]
-    min_index = np.nonzero(normalized)[0][0]  # gets the minimal index that is not zero
-    norm_hist = np.round((normalized - normalized[min_index]) * (NUM_OF_PIXELS - 1) /
-                         (normalized[-1] - normalized[min_index])).astype(np.int)
-    y = norm_hist[im]  # does the mapping to a new y or greyscale
-    new_hist, bounds = np.histogram(y, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
-    return y, hist, new_hist
+    if cum_hist[-1] != 0:
+        normalized = cum_hist / cum_hist[-1]
+        min_index = np.nonzero(normalized)[0][0]  # gets the minimal index that is not zero
+        norm_hist = np.round((normalized - normalized[min_index]) * (NUM_OF_PIXELS - 1) /
+                             (normalized[-1] - normalized[min_index])).astype(np.int)
+        y = norm_hist[im]  # does the mapping to a new y or greyscale
+        new_hist, bounds = np.histogram(y, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
+        return y, hist, new_hist
 
 
 def quantize (im_orig, n_quant, n_iter):
@@ -129,12 +130,13 @@ def find_uniform_z(hist, n_quant):
     """
     z = np.array([START_Z_LEVEL])
     cum_hist = hist.cumsum()
-    norm_hist = cum_hist / cum_hist[-1]  # calculates the normalized cum histogram
-    for i in range(1, n_quant):
-        array = np.nonzero(norm_hist >= i/n_quant)  # gets the percentage of pixels that is above the percentage of q
-        z = np.append(z, array[0][0])  # assign the lowest level that passes the percentage above q percentage
-    z = np.append(z, NUM_OF_PIXELS - 1)
-    return z
+    if cum_hist[-1] != 0:
+        norm_hist = cum_hist / cum_hist[-1]  # calculates the normalized cum histogram
+        for i in range(1, n_quant):
+            array = np.nonzero(norm_hist >= i/n_quant)  # gets the percentage of pixels that above the percentage of q
+            z = np.append(z, array[0][0])  # assign the lowest level that passes the percentage above q percentage
+        z = np.append(z, NUM_OF_PIXELS - 1)
+        return z
 
 
 def find_z(q, n_quant):
@@ -239,9 +241,9 @@ def make_new_im(im, z, q):
     return new_im
 
 # im = imageio.imread('externals/monkey.jpg')/255
-# plt.imshow(im, cmap="gray")
+# plt.imshow(grad, cmap="gray")
 # plt.show()
-# im_eq, hist, new_hist = histogram_equalize(im)
+# im_eq, hist, new_hist = histogram_equalize(grad)
 # plt.imshow(im_eq, cmap="gray")
 # plt.show()
 # plt.figure()
