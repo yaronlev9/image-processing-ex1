@@ -1,0 +1,6 @@
+Q1 answer:
+if we create a division of grey levels between zi to z(i+1) and there are no pixels marked with those
+levels in the histogram in that area we might get 0 pixels. when calculating the qi that is between the zi
+and the z(i+1) we will divide by the sum of the histogram of that area, and if the sum is zero we will divide by
+zero that will give us an error. that is why when the q array is too big we will divide to smaller segments
+and the chance to get a segment with zero pixels increases.
