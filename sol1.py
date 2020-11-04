@@ -11,7 +11,6 @@ RGB_IMAGE_SHAPE_SIZE = 3
 x = np.hstack([np.repeat(np.arange(0,50,2),10)[None,:], np.array([255]*6)[None,:]])
 grad = np.tile(x,(256,1))/255
 
-
 def read_image(filename, representation):
     """
     this function recieves a name of an image file, if the image is colored turns it to grayscale if not
@@ -20,7 +19,12 @@ def read_image(filename, representation):
     :param representation: if 1 returns and image is colored returns a grayscale image if 2 returns the colored image
     :return: the imange type float 64
     """
-    im = imageio.imread(filename)
+    try:
+        im = imageio.imread(filename)
+    except IOError:
+        return
+    if representation != 1 and representation != 2:
+        return
     if len(im.shape) == RGB_IMAGE_SHAPE_SIZE and representation == 1:
         img_gray = rgb2gray(im)
         return img_gray
@@ -35,7 +39,12 @@ def imdisplay(filename, representation):
     :param filename: the name of the file
     :param representation: 1 for grey 2 for colored
     """
-    img = read_image(filename, representation)
+    try:
+        img = read_image(filename, representation)
+    except IOError:
+        return
+    if representation != 1 and representation != 2:
+        return
     plt.figure()
     plt.imshow(img, cmap="gray")
     plt.show()
@@ -89,14 +98,15 @@ def calc_histogam(im):
     """
     hist, bounds = np.histogram(im, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
     cum_hist = hist.cumsum()
-    if cum_hist[-1] != 0:
-        normalized = cum_hist / cum_hist[-1]
-        min_index = np.nonzero(normalized)[0][0]  # gets the minimal index that is not zero
-        norm_hist = np.round((normalized - normalized[min_index]) * (NUM_OF_PIXELS - 1) /
-                             (normalized[-1] - normalized[min_index])).astype(np.int)
-        y = norm_hist[im]  # does the mapping to a new y or greyscale
-        new_hist, bounds = np.histogram(y, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
-        return y, hist, new_hist
+    if cum_hist[-1] == 0:
+        return im, hist, hist
+    normalized = cum_hist / cum_hist[-1]
+    min_index = np.nonzero(normalized)[0][0]  # gets the minimal index that is not zero
+    norm_hist = np.round((normalized - normalized[min_index]) * (NUM_OF_PIXELS - 1) /
+                         (normalized[-1] - normalized[min_index])).astype(np.int)
+    y = norm_hist[im]  # does the mapping to a new y or greyscale
+    new_hist, bounds = np.histogram(y, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
+    return y, hist, new_hist
 
 
 def quantize (im_orig, n_quant, n_iter):
@@ -107,6 +117,8 @@ def quantize (im_orig, n_quant, n_iter):
     :param n_iter: the number of iterations
     :return: a new image after quantize and the error array
     """
+    if n_quant <= 0 or n_iter <= 0:
+        return
     if len(im_orig.shape) == RGB_IMAGE_SHAPE_SIZE:  # checks if the image is rgb
         im_yiq = rgb2yiq(im_orig)
         im_y = (im_yiq[:,:,0] * (NUM_OF_PIXELS - 1)).astype(np.int)
@@ -130,13 +142,14 @@ def find_uniform_z(hist, n_quant):
     """
     z = np.array([START_Z_LEVEL])
     cum_hist = hist.cumsum()
-    if cum_hist[-1] != 0:
-        norm_hist = cum_hist / cum_hist[-1]  # calculates the normalized cum histogram
-        for i in range(1, n_quant):
-            array = np.nonzero(norm_hist >= i/n_quant)  # gets the percentage of pixels that above the percentage of q
-            z = np.append(z, array[0][0])  # assign the lowest level that passes the percentage above q percentage
-        z = np.append(z, NUM_OF_PIXELS - 1)
-        return z
+    if cum_hist[-1] == 0:
+        return np.full(n_quant + 1, 0)
+    norm_hist = cum_hist / cum_hist[-1]  # calculates the normalized cum histogram
+    for i in range(1, n_quant):
+        array = np.nonzero(norm_hist >= i/n_quant)  # gets the percentage of pixels that above the percentage of q
+        z = np.append(z, array[0][0])  # assign the lowest level that passes the percentage above q percentage
+    z = np.append(z, NUM_OF_PIXELS - 1)
+    return z
 
 
 def find_z(q, n_quant):
@@ -167,6 +180,8 @@ def find_q (hist, z, n_quant):
         arr *= hist[z[i] + 1: z[i+1] + 1]
         divisor_sum = arr.sum()
         divided_sum = hist[z[i] + 1: z[i+1] + 1].sum()
+        if divided_sum == 0:
+            continue
         q = np.append(q, divisor_sum // divided_sum)
     return q.astype(np.int)
 
