@@ -198,7 +198,6 @@ def calc_quantize(im, n_quant, n_iter):
     hist, bounds = np.histogram(im, NUM_OF_PIXELS, [0, NUM_OF_PIXELS - 1])
     prev_z = find_uniform_z(hist, n_quant)
     q = find_q(hist, prev_z, n_quant)
-    # err = calc_error(hist, prev_z, q)
     err_arr = np.array([], dtype=np.int64)
     for i in range(n_iter):
         z, q, err = make_iteration(hist, q, n_quant)  # does the iteration
@@ -364,3 +363,4 @@ def make_new_im(im, z, q):
 # for im in images:
 #     # change "False" to "True" if you wish to add the bonus task to the print
 #     display_all(im[0], False)
+
