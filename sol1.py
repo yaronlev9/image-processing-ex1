@@ -29,7 +29,7 @@ def read_image(filename, representation):
         img_gray = rgb2gray(im)
         return img_gray
     else:
-        return im / NUM_OF_PIXELS - 1
+        return im / (NUM_OF_PIXELS - 1)
 
 
 
@@ -254,29 +254,113 @@ def make_new_im(im, z, q):
         new_hist = np.append(new_hist, np.full((z[i+1] - z[i]), q[i]))  # adds the value of q[i] to the indexes
     new_im = new_hist[im]  # does the mapping to the new images
     return new_im
-
-# im = imageio.imread('externals/monkey.jpg')/255
-# plt.imshow(grad, cmap="gray")
-# plt.show()
-# im_eq, hist, new_hist = histogram_equalize(grad)
-# plt.imshow(im_eq, cmap="gray")
-# plt.show()
-# plt.figure()
-# plt.plot(hist.cumsum())
-# plt.show()
-# plt.figure()
-# plt.plot(new_hist.cumsum())
-# plt.show()
-
-# im = imageio.imread('externals/monkey.jpg')/255
-# im_eq = histogram_equalize(im)[0]
-# plt.imshow(im, cmap="gray")
-# plt.show()
-# im_eq, error = quantize(im, 5, 20)
-# plt.imshow(im_eq, cmap="gray")
-# plt.show()
-# plt.figure()
-# plt.plot(error)
-# plt.show()
-
-#check initial error
+#
+# # im = imageio.imread('externals/monkey.jpg')/255
+# # plt.imshow(grad, cmap="gray")
+# # plt.show()
+# # im_eq, hist, new_hist = histogram_equalize(grad)
+# # plt.imshow(im_eq, cmap="gray")
+# # plt.show()
+# # plt.figure()
+# # plt.plot(hist.cumsum())
+# # plt.show()
+# # plt.figure()
+# # plt.plot(new_hist.cumsum())
+# # plt.show()
+#
+# # im = read_image('externals/monkey.jpg', 1)
+# # im_eq = histogram_equalize(im)[0]
+# # plt.imshow(im_eq, cmap="gray")
+# # plt.show()
+# # im_eq, error = quantize(im_eq, 5, 10)
+# # plt.imshow(im_eq, cmap="gray")
+# # plt.show()
+# # plt.figure()
+# # plt.plot(error)
+# # plt.show()
+#
+# #check initial error
+#
+# import skimage.color
+# images = []
+# jer_bw = read_image(r"externals/jerusalem.jpg", 1)
+# images.append((jer_bw, "jerusalem grayscale"))
+# jer_rgb = read_image(r"externals/jerusalem.jpg", 2)
+# images.append((jer_rgb, "jerusalem RGB"))
+# low_bw = read_image(r"externals/low_contrast.jpg", 1)
+# images.append((low_bw, "low_contrast grayscale"))
+# low_rgb = read_image(r"externals/low_contrast.jpg", 2)
+# images.append((low_rgb, "low_contrast RGB"))
+# monkey_bw = read_image(r"externals/monkey.jpg", 1)
+# images.append((monkey_bw, "monkey grayscale"))
+# monkey_rgb = read_image(r"externals/monkey.jpg", 2)
+# images.append((monkey_rgb, "monkey RGB"))
+#
+#
+# def test_rgb2yiq_and_yiq2rgb(im, name):
+#     """
+#     Tests the rgb2yiq and yiq2rgb functions by comparing them to the built in ones in the skimage library.
+#     Allows error to magnitude of 1.e-3 (Difference from built in functions can't be bigger than 0.001).
+#     :param im: The image to test on.
+#     :param name: Name of image.
+#     :return: 1 on success, 0 on failure.
+#     """
+#     imp = rgb2yiq(im)
+#     off = skimage.color.rgb2yiq(im)
+#
+#     if not np.allclose(imp, off, atol=1.e-3):
+#         print("ERROR: in rgb2yiq on image '%s'" % name)
+#         return 0
+#     imp2 = yiq2rgb(imp)
+#     off2 = skimage.color.yiq2rgb(off)
+#     if not np.allclose(imp2, off2, atol=1.e-3):
+#         print("ERROR: in yiq2rgb on image '%s'" % name)
+#         return 0
+#     print("passed conversion test on '%s'" % name)
+#     return 1
+#
+#
+# for im in images:
+#     if len(im[0].shape) == 3:
+#         result = test_rgb2yiq_and_yiq2rgb(im[0], im[1])
+#         if not result:
+#             print("=== Failed Conversion Test ===")
+#             break
+#
+#
+# def display_all(im, add_bonus):
+#     if len(im.shape) == 3 and add_bonus:
+#         fig, a = plt.subplots(nrows=3, ncols=2)
+#     else:
+#         fig, a = plt.subplots(nrows=2, ncols=2)
+#
+#     # adds the regular image
+#     a[0][0].imshow(im, cmap=plt.cm.gray)
+#     a[0][0].set_title(r"original image")
+#
+#     # adds the quantified image
+#     quant = quantize(im, 3, 10)[0]
+#     a[0][1].imshow(quant, cmap=plt.cm.gray)
+#     a[0][1].set_title(r"quantize to 3 levels, 10 iterations")
+#
+#     # adds the histogram equalized image
+#     hist = histogram_equalize(im)[0]
+#     a[1][0].imshow(hist, cmap=plt.cm.gray)
+#     a[1][0].set_title("histogram equalization")
+#
+#     # adds quantization on histogram equalized image
+#     hist_quant = quantize(hist, 6, 10)[0]
+#     a[1][1].imshow(hist_quant, cmap=plt.cm.gray)
+#     a[1][1].set_title("quantize on equalization")
+#
+#     # adds the bonus image
+#     if len(im.shape) == 3 and add_bonus:
+#         # a[2][0].imshow(quantize_rgb(im, 3))
+#         a[2][0].set_title(r"bonus quantize_rgb")
+# 
+#     plt.show()
+#
+#
+# for im in images:
+#     # change "False" to "True" if you wish to add the bonus task to the print
+#     display_all(im[0], False)
